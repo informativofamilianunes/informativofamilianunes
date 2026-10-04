@@ -532,14 +532,23 @@ margin-top: 8px;
 }
 }
 </style>
+<p><!-- FECHA O CSS AQUI --></p>
+<!-- CARD DE DIRETRIZES DO IFN (FORA DO ESTILO CSS) -->
+<div style="background: rgba(255, 255, 255, 0.92); border-radius: 8px; padding: 10px 16px; margin-bottom: 12px; border-left: 5px solid #2c3e50; font-size: 0.82em; color: #444;">
+<p><strong>📌 Diretrizes do IFN:</strong><br> O IFN é o nosso mural
+digital familiar. O termo <em>Informativo</em> representa o nosso
+compromisso em compartilhar apenas o essencial para o dia a dia:
+previsão do tempo, música, saúde e conhecimento útil, sem exposição
+pessoal e isento de discussões políticas, religiosas ou esportivas.</p>
+</div>
 <!-- 1ª CAIXA COM NOME PORTAL IFN -->
 <div class="card-top-compact">
 <h3>
 Portal IFN
 </h3>
 <p>
-Welcome ao <strong>IFN</strong>! Consulta rápida diária de meteorologia,
-seleção musical, conhecimento e utilidades familiares.
+Welcome ao <strong>IFN</strong>! Consulta rápida diária de previsão do
+tempo, seleção musical, conhecimento e utilidades familiares.
 </p>
 </div>
 <!-- DESTAQUE BOM PERFUME -->
@@ -619,19 +628,18 @@ Carregando…</span></p>
 </div>
 </div>
 <div class="footer-ifn">
-<p><strong>IFN</strong> — Canal Informativo Familiar.</p>
+<p><strong>IFN</strong> — Canal Informativo Familiar (Fundado em
+2026).</p>
 </div>
 <script>
-  // 1. MEDIÇÃO DA TEMPERATURA EM TEMPO REAL
+  // 1. TEMPERATURA EM TEMPO REAL VIA API
   fetch('https://api.open-meteo.com/v1/forecast?latitude=-32.033&longitude=-52.100&current_weather=true')
     .then(response => response.json())
     .then(data => {
       const temp = Math.round(data.current_weather.temperature);
       document.getElementById('temp-rg').innerText = `🌊 Rio Grande: ${temp}°C ⛅`;
     })
-    .catch(() => {
-      document.getElementById('temp-rg').innerText = '🌊 Rio Grande: --°C';
-    });
+    .catch(() => { document.getElementById('temp-rg').innerText = '🌊 Rio Grande: --°C'; });
 
   fetch('https://api.open-meteo.com/v1/forecast?latitude=-31.765&longitude=-52.337&current_weather=true')
     .then(response => response.json())
@@ -639,58 +647,88 @@ Carregando…</span></p>
       const temp = Math.round(data.current_weather.temperature);
       document.getElementById('temp-pel').innerText = `🏛️ Pelotas: ${temp}°C ☀️`;
     })
-    .catch(() => {
-      document.getElementById('temp-pel').innerText = '🏛️️ Pelotas: --°C';
-    });
+    .catch(() => { document.getElementById('temp-pel').innerText = '🏛️ Pelotas: --°C'; });
 
-  // 2. SUGESTÕES AUTOMÁTICAS QUE MUDAM A CADA DIA DA SEMANA
-  const diaSemana = new Date().getDay(); // 0 = Domingo, 1 = Segunda, ..., 6 = Sábado
+  // 2. MATRIZ DINÂMICA DE SUGESTÕES (VARIABILIDADE POR SEMANA DO MÊS)
+  const agora = new Date();
+  const diaSemana = agora.getDay(); // 0 a 6
+  const diaDoMes = agora.getDate();  // 1 a 31
+  // Define a semana do mês (0, 1, 2 ou 3) para alternar o catálogo a cada semana
+  const semanaDoMes = Math.floor((diaDoMes - 1) / 7) % 2; // Alterna entre Opção A (0) e Opção B (1)
 
+  // CATÁLOGOS DE MÚSICA (OPÇÃO A e OPÇÃO B)
   const sugestoesMusica = [
-    "<strong>🎸 Domingo:</strong> Violão Instrumental Relaxante & MPB Acústica",
-    "<strong>🎧 Segunda:</strong> Playlist de Foco & Produtividade no Trabalho",
-    "<strong>🎷 Terça:</strong> Jazz Suave & Som Instrumental de Fundo",
-    "<strong>🇬🇧 Quarta:</strong> Músicas de Londres & Pop Britânico Clássico",
-    "<strong>🎻 Quinta:</strong> Violão Fingerstyle — Seleção Luke Silva",
-    "<strong>🎹 Sexta:</strong> Lo-Fi Chill & Ritmos para Descontrair",
-    "<strong>☕ Sábado:</strong> Acústicos Leves para o Fim de Semana"
+    // OPÇÃO A (Semana 1 e 3)
+    [
+      "<strong>🎸 Domingo:</strong> Violão Instrumental Relaxante & MPB Acústica",
+      "<strong>🎧 Segunda:</strong> Playlist de Foco & Produtividade no Trabalho",
+      "<strong>🎷 Terça:</strong> Jazz Suave & Som Instrumental de Fundo",
+      "<strong>🇬🇧 Quarta:</strong> Músicas de Londres & Pop Britânico Clássico",
+      "<strong>🎻 Quinta:</strong> Violão Fingerstyle — Seleção Luke Silva",
+      "<strong>🎹 Sexta:</strong> Lo-Fi Chill & Ritmos para Descontrair",
+      "<strong>☕ Sábado:</strong> Acústicos Leves para o Fim de Semana"
+    ],
+    // OPÇÃO B (Semana 2 e 4)
+    [
+      "<strong>🌊 Domingo:</strong> Sons da Natureza, Ondas & Piano Relaxante",
+      "<strong>💻 Segunda:</strong> Ambient Music & Beats sem Letra para Estudo",
+      "<strong>🎷 Terça:</strong> Bossa Nova Clássica & Instrumental Brasileiro",
+      "<strong>🎸 Quarta:</strong> Rock Clássico Anos 80 e 90 Unplugged",
+      "<strong>🎻 Quinta:</strong> Trilhas Sonoras de Filmes & Neoclássico",
+      "<strong>🎧 Sexta:</strong> Deep House Smooth & Grooves para o Fim de Tarde",
+      "<strong>☕ Sábado:</strong> Blues Suave & Instrumental de Café"
+    ]
   ];
 
+  // CATÁLOGOS DE CONHECIMENTO & IMAGENS ILUSTRATIVAS
   const sugestoesNoticia = [
-    "<strong>🌿 Domingo:</strong> Bem-Estar Familiar, Lazer e Hábitos Saudáveis",
-    "<strong>💡 Segunda:</strong> Inovação, Gestão e Ferramentas de Produtividade",
-    "<strong>💄 Terça:</strong> Skincare, Beleza e Cuidados com a Pele",
-    "<strong>🎓 Quarta:</strong> Tecnologias na Educação e Cursos Gratuitos",
-    "<strong>📈 Quinta:</strong> Tendências de Mercado, Negócios e Tráfego Pago",
-    "<strong>🏥 Sexta:</strong> Longevidade Ativa & Fisioterapia Preventiva",
-    "<strong>📚 Sábado:</strong> Leituras Recomendadas, Cultura e Aprendizado"
+    // OPÇÃO A (Semana 1 e 3)
+    [
+      { texto: "<strong>🌿 Domingo:</strong> Bem-Estar Familiar, Lazer e Hábitos Saudáveis", img: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=400&q=80" },
+      { texto: "<strong>💡 Segunda:</strong> Inovação, Gestão e Ferramentas de Produtividade", img: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=400&q=80" },
+      { texto: "<strong>💄 Terça:</strong> Skincare, Beleza e Cuidados com a Pele", img: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=400&q=80" },
+      { texto: "<strong>🎓 Quarta:</strong> Tecnologias na Educação e Cursos Gratuitos", img: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=400&q=80" },
+      { texto: "<strong>📈 Quinta:</strong> Tendências de Mercado, Negócios e Tráfego Pago", img: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=400&q=80" },
+      { texto: "<strong>🏥 Sexta:</strong> Longevidade Ativa & Fisioterapia Preventiva", img: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=400&q=80" },
+      { texto: "<strong>📚 Sábado:</strong> Leituras Recomendadas, Cultura e Aprendizado", img: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=400&q=80" }
+    ],
+    // OPÇÃO B (Semana 2 e 4)
+    [
+      { texto: "<strong>🚴 Domingo:</strong> Atividades ao Ar Livre, Sol e Mobilidade Urbana", img: "https://images.unsplash.com/photo-1471506480208-91b3a4cc78be?auto=format&fit=crop&w=400&q=80" },
+      { texto: "<strong>🤖 Segunda:</strong> Inteligência Artificial na Rotina Prática", img: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=400&q=80" },
+      { texto: "<strong>🥗 Terça:</strong> Nutrição Prática, Receitas Rápidas e Alimentos Funcionais", img: "https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=400&q=80" },
+      { texto: "<strong>🌐 Quarta:</strong> Dicas de Segurança Digital e Proteção de Dados", img: "https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=400&q=80" },
+      { texto: "<strong>📊 Quinta:</strong> Finanças Pessoais, Planejamento e Organização", img: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=400&q=80" },
+      { texto: "<strong>🧠 Sexta:</strong> Saúde Mental, Qualidade do Sono e Descanso", img: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=400&q=80" },
+      { texto: "<strong>🎨 Sábado:</strong> Arquitetura, Design de Interiores e Organização do Lar", img: "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=400&q=80" }
+    ]
   ];
 
-  const tickersMusica = [
-    "🎧 Domingo de Descanso: Playlists de Violão e MPB para curtir a família!",
-    "🎧 Segunda Focada: Sons instrumentais para iniciar a semana com alta energia!",
-    "🎧 Terça Musical: Acompanhe seleções clássicas de Jazz e Lo-Fi!",
-    "🎧 Quarta Especial: Músicas urbanas de Londres e clássicos internacionais!",
-    "🎧 Quinta de Fingerstyle: Destaque para as interpretações de Luke Silva no Violão!",
-    "🎧 Sexta Chegou: Sons relaxantes e descontraídos para fechar a semana!",
-    "🎧 Sábado de Lazer: Trilhas sonoras perfeitas para o descanso!"
-  ];
+  // APLICAÇÃO DINÂMICA
+  const musicaSelecionada = sugestoesMusica[semanaDoMes][diaSemana];
+  const noticiaSelecionada = sugestoesNoticia[semanaDoMes][diaSemana];
 
-  const tickersNoticias = [
-    "⚡ Destaque do Dia: Qualidade de vida, saúde e convivência em família!",
-    "⚡ Destaque do Dia: Gestão de projetos, tecnologia e aprendizado prático!",
-    "⚡ Destaque do Dia: Cuidados especiais com a pele e tendências de beleza!",
-    "⚡ Destaque do Dia: Dicas de estudos, inteligência artificial e inovação!",
-    "⚡ Destaque do Dia: Notícias sobre marketing digital e oportunidades de negócios!",
-    "⚡ Destaque do Dia: Exercícios de mobilidade, saúde e longevidade ativa!",
-    "⚡ Destaque do Dia: Dicas de leitura, cultura e lazer para o fim de semana!"
-  ];
+  // Atualiza o texto da sugestão de música e adiciona o Player de Áudio
+  document.getElementById('sugestao-musica').innerHTML = `
+    ${musicaSelecionada}<br>
+    <div style="margin-top: 6px;">
+      <small style="color: #666; font-size: 0.78em;">🔊 Prévia / Áudio do Dia:</small><br>
+      <audio controls style="width: 100%; height: 28px; margin-top: 2px;">
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+        Seu navegador não suporta o áudio.
+      </audio>
+    </div>
+  `;
 
-  // Aplica os textos correspondentes ao dia do acesso
-  document.getElementById('sugestao-musica').innerHTML = sugestoesMusica[diaSemana];
-  document.getElementById('sugestao-noticia').innerHTML = sugestoesNoticia[diaSemana];
-  document.getElementById('ticker-music').innerText = tickersMusica[diaSemana];
-  document.getElementById('ticker-news').innerText = tickersNoticias[diaSemana];
+  // Atualiza a sugestão de notícia com Imagem e Resumo Visual
+  document.getElementById('sugestao-noticia').innerHTML = `
+    <div style="display: flex; gap: 10px; align-items: center;">
+      <img src="${noticiaSelecionada.img}" alt="Resumo Visual" style="width: 65px; height: 65px; border-radius: 6px; object-fit: cover; flex-shrink: 0; border: 1px solid #ddd;">
+      <div>
+        ${noticiaSelecionada.texto}
+      </div>
+    </div>
+  `;
 </script>
 
 
