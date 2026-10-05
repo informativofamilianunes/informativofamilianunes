@@ -708,17 +708,8 @@ Carregando…</span></p>
   const musicaSelecionada = sugestoesMusica[semanaDoMes][diaSemana];
   const noticiaSelecionada = sugestoesNoticia[semanaDoMes][diaSemana];
 
-  // Atualiza o texto da sugestão de música e adiciona o Player de Áudio
-  document.getElementById('sugestao-musica').innerHTML = `
-    ${musicaSelecionada}<br>
-    <div style="margin-top: 6px;">
-      <small style="color: #666; font-size: 0.78em;">🔊 Prévia / Áudio do Dia:</small><br>
-      <audio controls style="width: 100%; height: 28px; margin-top: 2px;">
-        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
-        Seu navegador não suporta o áudio.
-      </audio>
-    </div>
-  `;
+  // Atualiza o texto da sugestão de música de forma minimalista
+  document.getElementById('sugestao-musica').innerHTML = musicaSelecionada;
 
   // Atualiza a sugestão de notícia com Imagem e Resumo Visual
   document.getElementById('sugestao-noticia').innerHTML = `
