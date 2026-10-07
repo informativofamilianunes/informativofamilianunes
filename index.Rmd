@@ -190,20 +190,6 @@ body {
   border: 1px solid #22c55e;
 }
 
-/* TEMPERATURA RÁPIDA */
-.weather-quick-badge {
-  background: #f0f4f8;
-  border-radius: 6px;
-  padding: 6px 10px;
-  margin-bottom: 8px;
-  display: flex;
-  justify-content: space-around;
-  font-size: 0.85em;
-  font-weight: 600;
-  color: #1a252f;
-  border-left: 4px solid #0288d1;
-}
-
 .btn-ifn {
   background-color: #2c3e50;
   color: #ffffff !important;
@@ -236,7 +222,6 @@ body {
 <div style="display: flex; align-items: center; gap: 15px; margin-top: 5px; margin-bottom: 5px;">
 <img src="logo_ifn.jpg" alt="Logo IFN" style="height: 55px; width: auto; border-radius: 8px;">
 <div>
-
 <div class="page-header-title" style="margin: 0;">Informativo Família Nunes</div>
 <div class="datetime-badge" id="relogio-ifn" style="margin: 0;">📅 Carregando data e hora...</div>
 </div>
@@ -270,16 +255,23 @@ body {
 <!-- SEÇÕES DO PORTAL -->
 <div class="row">
 
-<!-- PREVISÃO DO TEMPO -->
+<!-- PREVISÃO DO TEMPO (UNIFICADA E ALINHADA) -->
 <div class="col-md-4">
 <div class="card-item">
 <div>
 <h3>🌤️ Previsão do Tempo</h3>
-<p>Boletins, vento e indicadores meteorológicos da região.</p>
 
-<div class="weather-quick-badge">
-<span id="temp-rg">🌊 Rio Grande: Carregando...</span>
-<span id="temp-pel">🏛️ Pelotas: Carregando...</span>
+<div class="weather-quick-badge" style="flex-direction: column; gap: 4px; padding: 6px 10px; background: #f8fafc; border-left: 4px solid #0288d1; border-radius: 6px; margin-bottom: 8px;">
+<!-- Linha 1: Rio Grande -->
+<div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.82em; font-weight: 600; color: #1e293b;">
+<span id="temp-rg">🌊 Rio Grande: --°C</span>
+<span id="chuva-rg" style="color: #0288d1; font-size: 0.95em;">🌧️ --%</span>
+</div>
+<!-- Linha 2: Pelotas -->
+<div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.82em; font-weight: 600; color: #1e293b; border-top: 1px dashed #cbd5e1; padding-top: 3px; margin-top: 2px;">
+<span id="temp-pel">🏛️ Pelotas: --°C</span>
+<span id="chuva-pel" style="color: #0288d1; font-size: 0.95em;">🌧️ --%</span>
+</div>
 </div>
 </div>
 
@@ -287,7 +279,7 @@ body {
 </div>
 </div>
 
-<!-- ESPAÇO MÚSICA (MINIMALISTA E LIMPO) -->
+<!-- ESPAÇO MÚSICA -->
 <div class="col-md-4">
 <div class="card-item">
 <div>
@@ -306,7 +298,7 @@ body {
 </div>
 </div>
 
-<!-- CONHECIMENTO & NOTÍCIAS (COM FOTO E RESUMO VISUAL) -->
+<!-- CONHECIMENTO & NOTÍCIAS -->
 <div class="col-md-4">
 <div class="card-item">
 <div>
@@ -339,31 +331,57 @@ body {
     const dataFormatada = agora.toLocaleDateString('pt-BR', opcoesData);
     const horaFormatada = agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
     
-    // Capitaliza o dia da semana
     const dataFinal = dataFormatada.charAt(0).toUpperCase() + dataFormatada.slice(1);
     document.getElementById('relogio-ifn').innerHTML = `📅 ${dataFinal} | 🕒 ${horaFormatada}`;
   }
   setInterval(atualizarDataHora, 1000);
   atualizarDataHora();
 
-  // 2. MEDIÇÃO DE TEMPERATURA EM TEMPO REAL
-  fetch('https://api.open-meteo.com/v1/forecast?latitude=-32.033&longitude=-52.100&current_weather=true')
+  // 2. TEMPERATURA E CHUVA EM TEMPO REAL (RIO GRANDE & PELOTAS)
+  
+  // A. Rio Grande
+  fetch('https://api.open-meteo.com/v1/forecast?latitude=-32.033&longitude=-52.100&current_weather=true&daily=precipitation_probability_max,precipitation_sum&timezone=America%2FSao_Paulo')
     .then(response => response.json())
     .then(data => {
       const temp = Math.round(data.current_weather.temperature);
+      const chanceChuva = data.daily.precipitation_probability_max[0];
+      const volumeChuva = data.daily.precipitation_sum[0];
+
       document.getElementById('temp-rg').innerText = `🌊 Rio Grande: ${temp}°C ⛅`;
+      
+      if (chanceChuva > 0) {
+        document.getElementById('chuva-rg').innerText = `🌧️ ${chanceChuva}% (${volumeChuva}mm)`;
+      } else {
+        document.getElementById('chuva-rg').innerText = `☀️ 0% (Sem chuva)`;
+      }
     })
-    .catch(() => { document.getElementById('temp-rg').innerText = '🌊 Rio Grande: --°C'; });
+    .catch(() => {
+      document.getElementById('temp-rg').innerText = '🌊 Rio Grande: --°C';
+      document.getElementById('chuva-rg').innerText = '🌧️ --%';
+    });
 
-  fetch('https://api.open-meteo.com/v1/forecast?latitude=-31.765&longitude=-52.337&current_weather=true')
+  // B. Pelotas
+  fetch('https://api.open-meteo.com/v1/forecast?latitude=-31.765&longitude=-52.337&current_weather=true&daily=precipitation_probability_max,precipitation_sum&timezone=America%2FSao_Paulo')
     .then(response => response.json())
     .then(data => {
       const temp = Math.round(data.current_weather.temperature);
-      document.getElementById('temp-pel').innerText = `🏛️ Pelotas: ${temp}°C ☀️`;
-    })
-    .catch(() => { document.getElementById('temp-pel').innerText = '🏛️ Pelotas: --°C'; });
+      const chanceChuva = data.daily.precipitation_probability_max[0];
+      const volumeChuva = data.daily.precipitation_sum[0];
 
-  // 3. SUGESTÕES DIÁRIAS (COM OS TRÊS NOVOS NOMES AJUSTADOS)
+      document.getElementById('temp-pel').innerText = `🏛️ Pelotas: ${temp}°C ☀️`;
+      
+      if (chanceChuva > 0) {
+        document.getElementById('chuva-pel').innerText = `🌧️ ${chanceChuva}% (${volumeChuva}mm)`;
+      } else {
+        document.getElementById('chuva-pel').innerText = `☀️ 0% (Sem chuva)`;
+      }
+    })
+    .catch(() => {
+      document.getElementById('temp-pel').innerText = '🏛️ Pelotas: --°C';
+      document.getElementById('chuva-pel').innerText = '🌧️ --%';
+    });
+
+  // 3. SUGESTÕES DIÁRIAS
   const diaSemana = new Date().getDay();
 
   const sugestoesMusica = [
